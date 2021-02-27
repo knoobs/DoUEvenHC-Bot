@@ -20,14 +20,14 @@ def update_player(name):
     player_hiscores = read_hiscores.read_hiscores(name)
     player_dict = read_hiscores.format_hiscores_text(player_hiscores.text)
     if player_dict == "FAIL":
-        return "Player update NOT successful"
+        return "Player update of '"+name+"' NOT successful"
     clan_data[name] = player_dict
     
     # Write new data
     with open(filename, "w") as write_file:
         json.dump(clan_data, write_file)
     
-    return "Player update successful"
+    return "Player update of '"+name+"' successful"
 
 def read_json(filename):
     data = {}
@@ -55,6 +55,18 @@ def remove_player(name):
     else:
         return_string = "Player not found in clan database"
     
-    return return_string 
+    return return_string
+
+def mass_update(textfile):
+    
+    # Read textfile
+    with open(textfile, "r") as read_file:
+        for line in read_file:
+            name = line.split('\n')[0]
+            if name != '':
+                return_string = update_player(name)
+                print(return_string)
+                
+    return
 
     

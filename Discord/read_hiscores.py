@@ -13,31 +13,15 @@ from xlwt import Workbook
 import time
 import math
 import random
+
+from constants import *
         
 
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"
 URL_short = "https://secure.runescape.com/m=hiscore_oldschool_ironman/hiscorepersonal?user1="
 headers = { "user-agent" : USER_AGENT }
 
-skill_list = ['Overall','Attack','Defence','Strength','Hitpoints','Ranged','Prayer','Magic','Cooking',
-              'Woodcutting','Fletching','Fishing','Firemaking','Crafting','Smithing',
-              'Mining','Herblore','Agility','Thieving','Slayer','Farming','Runecraft',
-              'Hunter','Construction']
-
-pvm_list = ['Bounty Hunter - Hunter','Clue Scrolls (all)','Clue Scrolls (beginner)',
-            'Clue Scrolls (easy)','Clue Scrolls (medium)','Clue Scrolls (hard)',
-            'Clue Scrolls (elite)','Clue Scrolls (master)','LMS - Rank','Soul Wars Zeal',
-            'Abyssal Sire','Alchemical Hydra','Barrows Chests','Byrophyta','Callisto',
-            'Cerberus','Chambers of Xeric','Chambers of Xeric: Challenge Mode',
-            'Chaos Elemental','Chaos Fanatic','Commander Zilyana','Corporeal Beast',
-            'Crazy Archaeologist','Dagannoth Prime','Dagannoth Rex','Dagannoth Supreme',
-            'Deranged Archaeologist','General Graardor','Giant Mole','Grotesque Guardians',
-            'Hespori','Kalphite Queen','King Black Dragon','Kraken',"Kree'Arra",
-            "K'ril Tsutsaroth",'Mimic','Nightmare','Obor','Sarachnis','Scorpia','Skotizo',
-            'The Gauntlet','The Corrupted Gauntlet','Theatre of Blood','Thermonuclear Smoke Devil',
-            'TzTok-Jad','TzKal-Zuk','Venenatis',"Vet'ion",'Vorkath','Wintertodt','Zalcano','Zulrah']
-
-def read_hiscores(name, hardcore=False):
+def read_hiscores(name, hardcore=True):
     # Read the ironman hiscores for the name above
     if hardcore:
         URL_short = "https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal?user1="
