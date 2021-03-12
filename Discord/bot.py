@@ -17,6 +17,8 @@ import json_updater
 import plotter
 import modeling
 
+from constants import *
+
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
@@ -33,7 +35,7 @@ async def send_goose(ctx):
 @bot.command(name='update')
 async def update_name(ctx, *argv):
     if len(argv) == 0:
-        await ctx.send("'!update <player_name>' (don't include the <'s)")
+        await ctx.send("'*!update <player_name>*' (don't include the <'s)")
     else:
         name = ""
         if len(argv) == 1:
@@ -48,7 +50,7 @@ async def update_name(ctx, *argv):
 @bot.command(name='remove')
 async def remove_name(ctx, *argv):
     if len(argv) == 0:
-        await ctx.send("'!remove <player_name>' (don't include the <'s)")
+        await ctx.send("'*!remove <player_name>*' (don't include the <'s)")
     else:
         name = ""
         if len(argv) == 1:
@@ -63,7 +65,7 @@ async def remove_name(ctx, *argv):
 @bot.command(name='xp')
 async def xp(ctx, *argv):
     if len(argv) == 0 or len(argv) == 1:
-        await ctx.send("'!xp <skill> <player_name>' (don't include the <'s)")
+        await ctx.send("'*!xp <skill> <player_name>*' (don't include the <'s)")
     else:
         name = ""
         if len(argv) == 2:
@@ -78,7 +80,7 @@ async def xp(ctx, *argv):
 @bot.command(name='rank')
 async def rank(ctx, *argv):
     if len(argv) == 0:
-        await ctx.send("'!rank <player_name>' (don't include the <'s)")
+        await ctx.send("'*!rank <player_name>*' (don't include the <'s)")
     else:
         name = ""
         if len(argv) == 1:
@@ -90,7 +92,7 @@ async def rank(ctx, *argv):
         data = json_updater.read_json('clan.json')
         if name.lower() not in data.keys():
             await ctx.send(name+" not found in clan database.\n"+
-                           "Use: !update <player_name>' to add to database (don't include the <'s)")
+                           "Use: '*!update <player_name>*' to add to database (don't include the <'s)")
         else:
             modeling.plot_ranks(name,False)
             await ctx.send(file=discord.File('rank_plot.png'))
@@ -116,7 +118,32 @@ async def plot_point_table(ctx, *argv):
         else:
             modeling.plot_point_table(name)
             await ctx.send(file=discord.File('pvm_points.jpg'))
-    
+            
+@bot.command(name='top')
+async def plot_top_boss(ctx, *argv):
+    if len(argv) == 0:
+        return_string = "Not enough inputs\n"
+        return_string += "'*!top <boss>*' returns top 10 killers of that boss\n"
+        return_string += "'*!top <x> <boss>*' returns top x killers of that boss\n"
+        return_string += "**I am a smart command and can recognize most shorthands for bosses**"
+        await ctx.send(return_string)
+    else:
+        boss = ""
+        num = 10
+        for arg in argv:
+            if arg.isdigit():
+                num = int(arg)
+                continue
+            boss+=arg+" "
+        boss = boss[:-1]
+        boss = modeling.find_boss(boss)
+        if boss in pvm_list:
+            modeling.plot_top_boss(boss,num)
+            await ctx.send(file=discord.File('top_boss.png'))
+        else:
+            return_string = "Unrecognized boss name - @ Hardc0reBruh to add it to shorthands\n"
+            return_string += "type '!top' for help"
+            await ctx.send(return_string) 
     
 nest_asyncio.apply()
 bot.run(TOKEN)

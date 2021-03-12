@@ -19,6 +19,21 @@ from constants import *
 #Equation modelling
 pvm_points_base = np.arange(1,50000)/10
 
+def find_boss(name):
+    
+    # Check case sensitivity of keys
+    for boss in pvm_list:
+        if name.lower() == boss.lower():
+            return boss
+        
+    # Check shorthands
+    for boss in pvm_short_dict:
+        if name.lower() in pvm_short_dict[boss]:
+            return boss
+        
+    # Return Default
+    return 'poop'
+
 def calc_pvm(pvm_dict):
     
     eff_ehb = 0    
@@ -39,7 +54,7 @@ def plot_ranks(player,show_plot=True):
         player_rank = data[name]['skills']['Overall']['rank']
         player_pvm = calc_pvm(data[name]['pvm'])
         if name == player.lower():
-            plt.plot(player_pvm,player_rank,color='yellow',marker='.',markersize=10)
+            plt.plot(player_pvm,player_rank,color='magenta',marker='.',markersize=10)
         else:
             plt.plot(player_pvm,player_rank,color='yellow',marker='.',markersize=1)  
         
@@ -136,6 +151,7 @@ def plot_point_table(name=''):
     text_font = generate_font
     x_pos = 75
     y_pos = 50
+    total_points = 0
     for boss in ehb_dict:
         # Calcs
         kc_multiplier = 1
@@ -143,6 +159,7 @@ def plot_point_table(name=''):
             kc_multiplier = pvm_dict[boss]['value']
         boss_points = 2*danger_dict[boss]*kc_multiplier/ehb_dict[boss]
         boss_table.append((boss,boss_points))
+        total_points += boss_points
         
         # Image Pasting
         boss_name = boss.replace(':','')
@@ -175,7 +192,7 @@ def plot_point_table(name=''):
             
     # Add total if player request
     if name != '':
-        footer_text = "Total: "+str(round(calc_pvm(pvm_dict),2))
+        footer_text = "Total: "+str(round(total_points,2))
         w, h = image_edit.textsize(footer_text, font=title_font)
         image_edit.text((int((image.width-w)/2),1012),footer_text,(255,255,0),font=title_font)
         
@@ -183,4 +200,92 @@ def plot_point_table(name=''):
         
     return boss_table
 
+def plot_top_boss(boss,num=10):
+    
+    # Load Data
+    data = json_updater.read_json('clan.json')
+    
+    # Edge Case: num cannot exceed number of players
+    if num > len(data):
+        num = len(data)
+       
+    # Get player data for boss
+    name_list = np.array([])
+    kc_list = np.array([])
+    for name in data:
+        kc_list = np.append(kc_list,data[name]['pvm'][boss]['value'])
+        name_list = np.append(name_list, name)
+    
+    # Sort player data for boss
+    top_list = []
+    while num > 0:
+        index_logical = kc_list == np.max(kc_list)
+        names = name_list[index_logical]
+        kcs = kc_list[index_logical]
+        
+        tie_count = len(names)
+        num -= tie_count
+        
+        for i in range(tie_count):
+            if int(kcs[i]) == 0:
+                break
+            top_list.append((names[i],int(kcs[i])))
+        
+        name_list = name_list[~index_logical]
+        kc_list = kc_list[~index_logical]
+        
+    # Generate Image
+    user_pixels = 40
+    num = len(top_list)
+    height = num*user_pixels+150
+    image = generate_background(0,height)
+    image = image.convert('RGBA')
+        
+    # Place overlay image
+    boss_name = boss.replace(':','')
+    boss_name = boss_name.replace(' ','_')
+    if os.path.exists(f"Images/{boss_name}.png"):
+        boss_image = Image.open(f"Images/{boss_name}.png")
+        boss_image = boss_image.resize(image.size)
+        if boss_image.mode != "RGBA":
+            boss_image = boss_image.convert("RGBA")
+        image = Image.blend(image, boss_image, alpha=0.3)
+    
+    # Create edittable
+    image_edit = ImageDraw.Draw(image)
+    
+    # Place title on image
+    font_size = 60
+    title_font = generate_font(font_size)
+    title_text = "Top "+str(num)+" Clan HC "+boss
+    if boss not in odd_pvm_list:
+        title_text += " Killers"
+    w, h = image_edit.textsize(title_text, font=title_font)
+    while w > image.width:
+        font_size -= 1
+        title_font = generate_font(font_size)
+        w, h = image_edit.textsize(title_text, font=title_font)
+    image_edit.text((int((image.width-w)/2),12),title_text,(255,255,0),font=title_font)
+    
+    # Place names on image
+    y_pos = 100
+    x_pos = 250
+    for i in range(num):
+        
+        place = str(i+1)+". "
+        name = top_list[i][0]
+        kc = str(top_list[i][1])
+        
+        # Text Pasting
+        text_font = generate_font(35)
+        image_edit.text((x_pos,y_pos),place+name,(255,255,0),font=text_font)
+        image_edit.text((x_pos + 350,y_pos),kc,(255,255,0),font=text_font)
+        
+        # Move Position
+        y_pos += user_pixels
+        
+    # Save image
+    image.save("top_boss.png")
+    
+    return top_list
 
