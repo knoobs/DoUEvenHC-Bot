@@ -69,4 +69,3 @@ def mass_update(textfile):
                 
     return
 
-    

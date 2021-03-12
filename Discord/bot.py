@@ -95,6 +95,28 @@ async def rank(ctx, *argv):
             modeling.plot_ranks(name,False)
             await ctx.send(file=discord.File('rank_plot.png'))
             os.remove('rank_plot.png')
+            
+@bot.command(name='points')
+async def plot_point_table(ctx, *argv):
+    if len(argv) == 0:
+        modeling.plot_point_table()
+        await ctx.send(file=discord.File('pvm_points.jpg'))
+    else:
+        name = ""
+        if len(argv) == 1:
+            name = argv[0]
+        else:
+            for arg in argv:
+                name+=arg+" "
+            name = name[:-1]
+        data = json_updater.read_json('clan.json')
+        if name.lower() not in data.keys():
+            await ctx.send(name+" not found in clan database.\n"+
+                           "Use: !update <player_name>' to add to database (don't include the <'s)")
+        else:
+            modeling.plot_point_table(name)
+            await ctx.send(file=discord.File('pvm_points.jpg'))
+    
     
 nest_asyncio.apply()
 bot.run(TOKEN)
