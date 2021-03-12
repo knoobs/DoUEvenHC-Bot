@@ -309,5 +309,3 @@ def plot_top_boss(boss,num=10,mode='value',gamemode='hardcore'):
     image.save("top_boss.png")
     
     return top_list
-
-plot_top_boss("Corporeal Beast")
