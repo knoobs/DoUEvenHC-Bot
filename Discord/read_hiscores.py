@@ -5,16 +5,11 @@ Created on Wed Jan 13 00:10:14 2021
 @author: kneub
 """
 
-from lxml import html
 import requests
 from bs4 import BeautifulSoup
-import xlwt
-from xlwt import Workbook
-import time
-import math
-import random
 
-from constants import *
+import modeling
+from constants import pvm_list, skill_list
         
 
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"
@@ -71,7 +66,8 @@ def format_hiscores_text(text):
         else:
             pvm_dict[boss].update({ 'rank'  : convert_to_int(text[index[0]+1]) })
             pvm_dict[boss].update({ 'value' : convert_to_int(text[index[0]+2]) })
-            
+    
+    pvm_dict = modeling.calc_pvm(pvm_dict)    
     player_dict = { "skills" : skills_dict, "pvm" : pvm_dict }
     
     return player_dict

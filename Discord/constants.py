@@ -5,6 +5,8 @@ Created on Sat Feb 27 13:01:13 2021
 @author: kneub
 """
 
+import numpy as np
+
 # List of skills from html export
 skill_list = ['Overall','Attack','Defence','Strength','Hitpoints','Ranged','Prayer','Magic','Cooking',
               'Woodcutting','Fletching','Fishing','Firemaking','Crafting','Smithing',
@@ -182,6 +184,44 @@ pvm_short_dict = {
         "Vet'ion"                           : ['vetion'],
         'Vorkath'                           : ['vork','vorki'],
         'Zalcano'                           : ['zalc'],
-        'Zulrah'                            : ['zul'],
+        'Zulrah'                            : ['zul','snake','snek'],
         'Wintertodt'                        : ['todt','wt']
         }
+
+skill_short_dict = {
+        'Overall'                           : ['all'],
+        'Attack'                            : ['att'],
+        'Defence'                           : ['def','defense'],
+        'Strength'                          : ['str'],
+        'Hitpoints'                         : ['hp'],
+        'Ranged'                            : ['range'],
+        'Prayer'                            : ['pray'],
+        'Magic'                             : ['mage'],
+        'Cooking'                           : ['cook'],
+        'Woodcutting'                       : ['wc','wood','chop'],
+        'Fletching'                         : ['fletch','why'],
+        'Fishing'                           : ['fish'],
+        'Firemaking'                        : ['fm','fire'],
+        'Crafting'                          : ['craft'],
+        'Smithing'                          : ['smith'],
+        'Mining'                            : ['mine'],
+        'Herblore'                          : ['herb'],
+        'Agility'                           : ['agi'],
+        'Thieving'                          : ['theiving','thief','thieve','theive'],
+        'Slayer'                            : ['slay'],
+        'Farming'                           : ['farm'],
+        'Runecraft'                         : ['runecrafting','rc','rcing'],
+        'Hunter'                            : ['hunt'],
+        'Construction'                      : ['con','poh']
+        }
+
+command_list = {
+        '!update'   : 'Adds player to clan database',
+        '!remove'   : 'Removes player from clan database',
+        '!xp'       : 'Plots xp for a player',
+        '!rank'     : 'Plots rank for a player',
+        '!points'   : 'Plots boss kills required for points OR points for a player',
+        '!top'      : 'Plots top hardcore boss killers in clan database'
+        }
+
+pvm_points_base = np.arange(1,50000)/10
