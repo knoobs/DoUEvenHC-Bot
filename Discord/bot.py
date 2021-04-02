@@ -15,18 +15,26 @@ from discord.ext import commands
 
 import json_updater
 import plotter
+import modeling
 import helper_functions as hf
 
 from constants import pvm_list, skill_list, command_list
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
+nest_asyncio.apply()
 
-bot = commands.Bot(command_prefix='!')
+intents = discord.Intents().all()
+bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.event
 async def on_ready():
     print(f'{bot.user.name} has connected to Discord!')
+    
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.errors.MissingPermissions):
+        await ctx.send("Hey there bucko... you don't have permission for that!")
     
 @bot.command(name='goose')
 async def send_goose(ctx):
@@ -56,7 +64,17 @@ async def update_name(ctx, *argv):
         return_string = json_updater.update_player(name.lower())
         await ctx.send(return_string)
         
+@bot.command(name='update_all')
+@commands.has_permissions(administrator=True)
+async def update_all(ctx):
+    await ctx.send("Updating all players... expect 20+ minute downtime.")
+    await bot.change_presence(status=discord.Status.idle, activity=discord.Game("Updating Players..."))
+    return_string = json_updater.update_all()
+    await bot.change_presence(status=discord.Status.online)
+    await ctx.send(return_string)
+        
 @bot.command(name='remove')
+@commands.has_permissions(administrator=True)
 async def remove_name(ctx, *argv):
     if len(argv) == 0:
         await ctx.send("'*!remove <player_name>*'")
@@ -99,23 +117,27 @@ async def xp(ctx, *argv):
 @bot.command(name='rank')
 async def rank(ctx, *argv):
     if len(argv) == 0:
-        await ctx.send("'*!rank <player_name>*'")
+        return_string = "'*!rank <player_name>*' returns rank plot with highlighted player\n"
+        return_string += "'*!rank <player_name> zoom+*' zooms in on lower rank\n"
+        return_string += "\tAdd as many +'s as you'd like: i.e. zoom++++"
+        await ctx.send(return_string)
     else:
         name = ""
-        if len(argv) == 1:
-            name = argv[0]
-        else:
-            for arg in argv:
-                name+=arg+" "
-            name = name[:-1]
+        zoom = 'none'
+        for arg in argv:
+            if 'zoom+' in arg:
+                zoom = str(arg.count('+'))
+                continue
+            name+=arg+" "
+        name = name[:-1]
         data = json_updater.read_json('clan.json')
         if name.lower() not in data.keys():
             await ctx.send(name+" not found in clan database.\n"+
                            "Use: '*!update <player_name>*' to add to database")
         else:
-            plotter.plot_ranks(name,False)
+            plotter.plot_ranks(name,False,zoom)
             await ctx.send(file=discord.File('rank_plot.png'))
-            os.remove('rank_plot.png')
+            #os.remove('rank_plot.png')
             
 @bot.command(name='points')
 async def plot_point_table(ctx, *argv):
@@ -168,6 +190,29 @@ async def plot_top_boss(ctx, *argv):
             return_string = "Unrecognized boss name - @ Hardc0reBruh to add it to shorthands\n"
             return_string += "type '*!top*' for help"
             await ctx.send(return_string) 
+            
+@bot.command(name='getrank')
+async def getrank(ctx, *argv):          
+    if len(argv) <= 1:
+        return_string = "'*!getrank <hc_rank> <pvm_points>*' returns rank of player with that rank and points\n"
+        await ctx.send(return_string)
+    else:
+        hc_rank = argv[0]
+        pvm_points = argv[1]
+        if not (hc_rank.isdigit() and pvm_points.replace('.','').isdigit()):
+            await ctx.send("'*!getrank <hc_rank> <pvm_points>*' (inputs must be numbers)")
+        else:
+            cc_rank = modeling.get_rank(hc_rank,pvm_points)
+            await ctx.send("Hc Rank: "+hc_rank+", Points: "+pvm_points+", => Clan Rank: "+str(cc_rank.title()))
+            
+@bot.command(name='reload')
+async def reload_cog(ctx, extension):
+    await ctx.send(f"Attempting to reload cog: {extension}")
+    bot.unload_extension(f"Cogs.{extension}")
+    bot.load_extension(f"Cogs.{extension}")
     
-nest_asyncio.apply()
+for cog in os.listdir("./Cogs"):
+    if cog.endswith('.py'):
+        bot.load_extension(f'Cogs.{cog[:-3]}')
+        
 bot.run(TOKEN)

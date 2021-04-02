@@ -1,0 +1,1 @@
+Inactive bingo event archive.

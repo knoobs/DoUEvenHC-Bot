@@ -33,14 +33,21 @@ def read_hiscores(name, hardcore=True):
         
     return soup
 
+def check_existence(text):
+    # Check if player exists
+    fail_string = 'no player'
+    existence_list = [False for i in text if fail_string in i.lower()]
+    if False in existence_list:
+        return False
+    else:
+        return True
+
 def format_hiscores_text(text):
     # Format text output
     text = [i for i in text.split('\n') if i != '']
     
-    # Check if player exists
-    fail_string = 'No player'
-    if fail_string in text:
-        return 'FAIL'
+    if not check_existence(text):
+        return "FAIL"
     
     # Create nice dictionaries
     skills_dict = {}
@@ -74,7 +81,5 @@ def format_hiscores_text(text):
 
 def convert_to_int(num):
     return int(num.replace(",",""))
-
-
 
 

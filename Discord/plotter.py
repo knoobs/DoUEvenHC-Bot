@@ -45,10 +45,11 @@ def plot_xp(player_name,skill="Overall",gamemode='hardcore'):
     return_string += "Clan median "+skill+" xp:\t "+format(int(round(np.median(xp))),",")
     return return_string
 
-def plot_ranks(player,show_plot=True,gamemode='hardcore'):
+def plot_ranks(player,show_plot=True,zoom='none',gamemode='hardcore'):
     
     data = json_updater.read_json('clan.json')
     fig = plt.figure()
+    cc_rank = ''
     for name in data.keys():
         player_rank = data[name][gamemode]['skills']['Overall']['rank']
         player_pvm = data[name][gamemode]['pvm']['points']
@@ -56,6 +57,7 @@ def plot_ranks(player,show_plot=True,gamemode='hardcore'):
             player_pvm = 5000
         if name == player.lower():
             plt.plot(player_pvm,player_rank,color='magenta',marker='.',markersize=10)
+            cc_rank = modeling.get_rank(player_rank,player_pvm)
         else:
             plt.plot(player_pvm,player_rank,color='yellow',marker='.',markersize=1)  
         
@@ -65,10 +67,11 @@ def plot_ranks(player,show_plot=True,gamemode='hardcore'):
         
         log_base   = rank_dict['base']
         offset     = rank_dict['offset']
+        k          = rank_dict['k']
         color_code = rank_dict['color']
         
-        pvm_points = np.array([i for i in pvm_points_base if i-offset > 0])
-        rank_line = 10**np.array([math.log(i-offset,log_base) for i in pvm_points])
+        pvm_points = np.array([i for i in pvm_points_base if i > 0])
+        rank_line = 10**np.array([math.log(i,log_base) for i in pvm_points])*(pvm_points/offset)**k
         
         plt.plot(pvm_points,rank_line,color_code)
     
@@ -90,7 +93,10 @@ def plot_ranks(player,show_plot=True,gamemode='hardcore'):
     plt.gca().invert_yaxis()
     plt.yticks([100000,10000,1000,100,10,1])
     plt.ylim((100000,1))
-    plt.xlim((0,5000))
+    if zoom.isdigit():
+        plt.xlim((0,int(5000/2**int(zoom))))
+    else:
+        plt.xlim((0,5000))
     plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:.0f}'))
     plt.xlabel("Pvm Points")
     plt.ylabel("HC Rank")
@@ -101,6 +107,23 @@ def plot_ranks(player,show_plot=True,gamemode='hardcore'):
         
     plt.savefig(fname='rank_plot',transparent=False, bbox_inches='tight',facecolor='#121111')
     plt.close()
+    
+    # Put player info on image
+    image = Image.open('rank_plot.png')
+    image_edit = ImageDraw.Draw(image)
+    player_font = hf.generate_font(20)
+    cc_rank = cc_rank.title()
+    player_text = player+': '+cc_rank
+    w, h = image_edit.textsize(player_text, font=player_font)
+    image_edit.text((image.width-w-45,image.height-60),player_text,(255,255,0),font=player_font)
+    
+    rank_image = Image.open(f'Images/{cc_rank}.png')
+    rank_image = rank_image.resize((20,20))
+    rank_image = rank_image.convert("RGBA")
+    image.paste(rank_image,(image.width-40,image.height-60),mask=rank_image)
+    
+    image.save('rank_plot.png')
+    
         
     return fig
 
@@ -158,12 +181,17 @@ def plot_point_table(name='',gamemode='hardcore'):
         # Text Pasting
         text_font = hf.generate_font(20)
         text_boss = boss.replace(':',' -')+":"
+        text_color = (255,255,0)
         if name == '':
             text_points = str(round(1/boss_points,2))
         else:
-            text_points = str(round(boss_points,2))
+            if boss_points == 0:
+                text_points = "--"
+                text_color = (255,255,255)
+            else:
+                text_points = str(round(boss_points,2))
         image_edit.text((x_pos + 50 ,y_pos + 12),text_boss,  (255,255,0),font=text_font)
-        image_edit.text((x_pos + 335,y_pos + 12),text_points,(255,255,0),font=text_font)
+        image_edit.text((x_pos + 335,y_pos + 12),text_points,text_color,font=text_font)
         
         # Move Position
         y_pos += 45

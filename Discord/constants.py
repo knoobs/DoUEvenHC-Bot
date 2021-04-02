@@ -25,7 +25,8 @@ pvm_list = ['Bounty Hunter - Hunter','Clue Scrolls (all)','Clue Scrolls (beginne
             'Hespori','Kalphite Queen','King Black Dragon','Kraken',"Kree'Arra",
             "K'ril Tsutsaroth",'Mimic','Nightmare','Obor','Sarachnis','Scorpia','Skotizo',
             'The Gauntlet','The Corrupted Gauntlet','Theatre of Blood','Thermonuclear Smoke Devil',
-            'TzTok-Jad','TzKal-Zuk','Venenatis',"Vet'ion",'Vorkath','Wintertodt','Zalcano','Zulrah']
+            'TzTok-Jad','TzKal-Zuk','Venenatis',"Vet'ion",'Vorkath','Wintertodt','Zalcano','Zulrah',
+            'Tempoross']
 
 odd_pvm_list = ['Bounty Hunter - Hunter','Clue Scrolls (all)','Clue Scrolls (beginner)',
             'Clue Scrolls (easy)','Clue Scrolls (medium)','Clue Scrolls (hard)',
@@ -33,13 +34,13 @@ odd_pvm_list = ['Bounty Hunter - Hunter','Clue Scrolls (all)','Clue Scrolls (beg
 
 # Rank Line Config Dict
 line_dict = {
-        'bronze'  : { 'base' : 3.5 , 'offset' : 10    , 'color' : 'saddlebrown'} ,
-        'iron'    : { 'base' : 4   , 'offset' : 75    , 'color' : 'dimgray'} ,
-        'steel'   : { 'base' : 5   , 'offset' : 250   , 'color' : 'silver'} ,
-        'mirthil' : { 'base' : 6   , 'offset' : 750   , 'color' : 'blue'} ,
-        'adamant' : { 'base' : 12  , 'offset' : 1500  , 'color' : 'green'} ,
-        'rune'    : { 'base' : 40  , 'offset' : 2500  , 'color' : 'cyan'} ,
-        'dragon'  : { 'base' : 100 , 'offset' : 3800  , 'color' : 'red'} ,
+        'bronze'  : { 'base' : 3.5 , 'offset' : 10    , 'k' : 1 , 'color' : 'saddlebrown'} ,
+        'iron'    : { 'base' : 4   , 'offset' : 75    , 'k' : 2 , 'color' : 'dimgray'} ,
+        'steel'   : { 'base' : 5   , 'offset' : 250   , 'k' : 3 , 'color' : 'silver'} ,
+        'mithril' : { 'base' : 8   , 'offset' : 750   , 'k' : 4 , 'color' : 'blue'} ,
+        'adamant' : { 'base' : 25  , 'offset' : 1500  , 'k' : 5 , 'color' : 'green'} ,
+        'rune'    : { 'base' : 80  , 'offset' : 3000  , 'k' : 6 , 'color' : 'cyan'} ,
+        'dragon'  : { 'base' : 250 , 'offset' : 4500  , 'k' : 9 , 'color' : 'red'} ,
         }
 
 # HC EHB Rates
@@ -185,7 +186,8 @@ pvm_short_dict = {
         'Vorkath'                           : ['vork','vorki'],
         'Zalcano'                           : ['zalc'],
         'Zulrah'                            : ['zul','snake','snek'],
-        'Wintertodt'                        : ['todt','wt']
+        'Wintertodt'                        : ['todt','wt'],
+        'Tempoross'                         : ['temp','temporos','tempeross','temperos','fishingboss']
         }
 
 skill_short_dict = {

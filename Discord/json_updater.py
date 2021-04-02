@@ -21,13 +21,19 @@ def update_player(name):
     player_hiscores = read_hiscores.read_hiscores(name)
     player_dict_hc = read_hiscores.format_hiscores_text(player_hiscores.text)
     if player_dict_hc == "FAIL":
-        return "Player update of '"+name+"' NOT successful"
+        return_string = "Player: '"+name+"' not found on Hardcore hiscores\n"
+        return_string+= "\tRemoving player...\n\t"
+        return_string+= remove_player(name)
+        return return_string
     
     #Get Iron data
     player_hiscores = read_hiscores.read_hiscores(name,False)
     player_dict_iron = read_hiscores.format_hiscores_text(player_hiscores.text)
     if player_dict_iron == "FAIL":
-        return "Player update of '"+name+"' NOT successful"
+        return_string = "Player: '"+name+"' not found on Ironman hiscores\n"
+        return_string+= "\tRemoving player...\n\t"
+        return_string+= remove_player(name)
+        return return_string
     
     status = True
     xp_hc = player_dict_hc['skills']['Overall']['xp']
@@ -91,21 +97,14 @@ def mass_update(textfile):
 def update_all():
     
     data = read_json('clan.json')
+    name_changes = []
     return_string = ""
     for name in data.keys():
         output = update_player(name)
         print(output)
-        if "NOT successful" in output:
-            return_string += output + "...\n"
-            return_string += "\tRemoving "+name+" from clan database...\n"
-            remove_output = remove_player(name)
-            if "successfully" not in remove_output:
-                return_string += "\tRemove unsuccessful." 
-                return_string += " Crazy you got here tbh, this is an odd edge case. Gz I guess?"
+        if "Removing" in output:
+            name_changes.append(name)
+            return_string+=(f"Removed: '{name}' due to name change or game ban\n")
         
-    if return_string == "":
-        return "All player updated successfully"
-    else:
-        return return_string
+    return return_string
     
-
