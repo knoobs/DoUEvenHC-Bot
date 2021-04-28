@@ -18,7 +18,7 @@ import plotter
 import modeling
 import helper_functions as hf
 
-from constants import pvm_list, skill_list, command_list
+from constants import pvm_list, skill_list, command_list, bot_channel, blacklist_channels
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -51,6 +51,15 @@ async def list_commands(ctx):
     
 @bot.command(name='update')
 async def update_name(ctx, *argv):
+    
+    # Check channel
+    message_channel = ctx.message.channel
+    if str(message_channel) in blacklist_channels:
+        print("Command received in unapproved channel")
+        approved_channel = discord.utils.get(ctx.guild.channels, name=bot_channel)
+        await approved_channel.send(f"{ctx.author.mention} Please use this channel for the bot.")
+        return
+        
     if len(argv) == 0:
         await ctx.send("'*!update <player_name>*'")
     else:
@@ -62,6 +71,7 @@ async def update_name(ctx, *argv):
                 name+=arg+" "
             name = name[:-1]
         return_string = json_updater.update_player(name.lower())
+        return_string += "\n**USE !updatebingo IF TRYING TO UPDATE BINGO**"
         await ctx.send(return_string)
         
 @bot.command(name='update_all')
@@ -116,6 +126,15 @@ async def xp(ctx, *argv):
         
 @bot.command(name='rank')
 async def rank(ctx, *argv):
+    
+    # Check channel
+    message_channel = ctx.message.channel
+    if str(message_channel) in blacklist_channels:
+        print("Command received in unapproved channel")
+        approved_channel = discord.utils.get(ctx.guild.channels, name=bot_channel)
+        await approved_channel.send(f"{ctx.author.mention} Please use this channel for the bot.")
+        return
+    
     if len(argv) == 0:
         return_string = "'*!rank <player_name>*' returns rank plot with highlighted player\n"
         return_string += "'*!rank <player_name> zoom+*' zooms in on lower rank\n"
@@ -141,6 +160,15 @@ async def rank(ctx, *argv):
             
 @bot.command(name='points')
 async def plot_point_table(ctx, *argv):
+    
+    # Check channel
+    message_channel = ctx.message.channel
+    if str(message_channel) in blacklist_channels:
+        print("Command received in unapproved channel")
+        approved_channel = discord.utils.get(ctx.guild.channels, name=bot_channel)
+        await approved_channel.send(f"{ctx.author.mention} Please use this channel for the bot.")
+        return
+    
     if len(argv) == 0:
         plotter.plot_point_table()
         await ctx.send(file=discord.File('pvm_points.jpg'))
@@ -162,6 +190,15 @@ async def plot_point_table(ctx, *argv):
             
 @bot.command(name='top')
 async def plot_top_boss(ctx, *argv):
+    
+    # Check channel
+    message_channel = ctx.message.channel
+    if str(message_channel) in blacklist_channels:
+        print("Command received in unapproved channel")
+        approved_channel = discord.utils.get(ctx.guild.channels, name=bot_channel)
+        await approved_channel.send(f"{ctx.author.mention} Please use this channel for the bot.")
+        return
+    
     if len(argv) == 0:
         return_string = "'*!top <boss>*' returns top 10 hc killers of that boss w/ kc\n"
         return_string += "'*!top <x> <boss>*' returns top x hc killers of that boss w/ kc\n"

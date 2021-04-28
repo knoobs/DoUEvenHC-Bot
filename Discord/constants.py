@@ -227,3 +227,7 @@ command_list = {
         }
 
 pvm_points_base = np.arange(1,50000)/10
+
+bot_channel = "bot-channel"
+
+blacklist_channels = ["general", "achievements", "bot-suggestions"]
